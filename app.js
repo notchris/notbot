@@ -3,9 +3,14 @@
 const irc = require("irc");
 const malScraper = require('mal-scraper')
 const animeQuotes = require("animequotes");
+const low = require('lowdb')
+const FileSync = require('lowdb/adapters/FileSync')
+
+const adapter = new FileSync('db.json')
+const db = low(adapter)
 
 const config = {
-    channels: ["##anime"],
+    channels: ["##notchris"],
     server: "chat.freenode.net",
     botName: "notbot"
 };
@@ -29,6 +34,56 @@ const bot = new irc.Client(config.server, config.botName, {
 // Listen for messages
 bot.addListener("message", function(from, to, text, message) {
     let msg = message.args[1];
+
+    // Give stars
+    if (msg.endsWith('++')) {
+        let name = msg.split('++')[0];
+        let users = Object.keys(bot.chans[config.channels[0]].users);
+
+        if (name !== from) {
+            if (users.includes(name)) {
+                let targetUser = db.get('users').find({ name: name }).value()
+                if (targetUser) {
+                    db.get('users').find({ name: name }).assign({ stars: targetUser.stars + 1}).write()
+                    bot.say(config.channels[0], `${from} gave ${name} a ★ || ${name} has ★ ${targetUser.stars + 1}`);
+                } else {
+                    db.get('users').push({ name: name, stars: 1}).write()
+                    bot.say(config.channels[0], `${from} gave ${name} a ★ || ${name} has ★ 1`);
+                }
+            } else {
+                bot.say(config.channels[0], `I couldn't find the user '${name}' in the channel.`);
+            }
+        } else {
+            bot.say(config.channels[0], `You can't give yourself stars.`);
+        }
+    }
+
+    // List stars
+    if (msg.startsWith('!stars')) {
+        let name = msg.split('!stars')[1];
+        name = name.trim()
+        let targetUser = db.get('users').find({ name: name }).value()
+        if (targetUser) {
+            bot.say(config.channels[0], `${name} has ★ ${targetUser.stars}`);
+        } else {
+            bot.say(config.channels[0], `I couldn't find the user '${name}'.`);
+        }
+    }
+
+    // List top 10
+    if (msg.startsWith('!top')) {
+        let filtered = db.get('users').sortBy('stars').take(10).value()
+        let top = filtered.reverse()
+        let list = '';
+        top.forEach(function (u,i) {
+            if (i === top.length - 1) {
+               list += `${u.name} [${u.stars} ★]`
+            } else {
+               list += `${u.name} [${u.stars} ★] || ` 
+            }
+        })
+        bot.say(config.channels[0], `Top users: ${list}`);
+    }
 
     // Anime quotes
     if (msg.startsWith('!quote')) {
@@ -64,4 +119,8 @@ bot.addListener("message", function(from, to, text, message) {
                 bot.say(config.channels[0], `I could not find any anime with the title "${name}".`);
             })
     }
-});
+})
+
+bot.addListener('error', function(message) {
+    console.log('error: ', message);
+})

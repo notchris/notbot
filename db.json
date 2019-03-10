@@ -1,0 +1,16 @@
+{
+  "users": [
+    {
+      "name": "notchris",
+      "stars": 5
+    },
+    {
+      "name": "notbot",
+      "stars": 4
+    },
+    {
+      "name": "EcchiSenpai",
+      "stars": 3
+    }
+  ]
+}
