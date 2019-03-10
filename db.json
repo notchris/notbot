@@ -2,15 +2,31 @@
   "users": [
     {
       "name": "notchris",
-      "stars": 5
+      "stars": 6
     },
     {
       "name": "notbot",
-      "stars": 4
+      "stars": 5
     },
     {
       "name": "EcchiSenpai",
-      "stars": 3
+      "stars": 4
+    },
+    {
+      "name": "Sadale",
+      "stars": 2
+    },
+    {
+      "name": "dfch",
+      "stars": 1
+    },
+    {
+      "name": "geihaiyan",
+      "stars": 0
+    },
+    {
+      "name": "Fenderbassist",
+      "stars": 9
     }
   ]
 }
