@@ -9,6 +9,7 @@
     "animequotes": "^1.0.0",
     "irc": "^0.5.2",
     "lowdb": "^1.0.0",
-    "mal-scraper": "^2.4.5"
+    "mal-scraper": "^2.4.5",
+    "node-fetch": "^2.3.0"
   }
 }

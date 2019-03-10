@@ -5,6 +5,7 @@ const malScraper = require('mal-scraper')
 const animeQuotes = require("animequotes");
 const low = require('lowdb')
 const FileSync = require('lowdb/adapters/FileSync')
+const fetch = require('node-fetch');
 
 const adapter = new FileSync('db.json')
 const db = low(adapter)
@@ -34,6 +35,20 @@ const bot = new irc.Client(config.server, config.botName, {
 // Listen for messages
 bot.addListener("message", function(from, to, text, message) {
     let msg = message.args[1];
+
+    // JSON example
+
+    if (msg.startsWith('!ip')) {
+        let ip = msg.split('!ip')[1];
+        ip = ip.trim()
+        let url = 'http://ip-api.com/json/' + ip;
+        fetch(url)
+            .then(res => res.json())
+            .then(function(json){
+                console.log(json)
+                bot.say(config.channels[0], `Location: ${json.city},${json.country}`);
+            })
+    }
 
     // Give stars
     if (msg.endsWith('++')) {
